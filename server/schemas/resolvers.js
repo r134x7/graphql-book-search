@@ -1,9 +1,10 @@
-import { User, Book, Auth } from "../models";
-import { signToken } from "../utils/auth";
+const { User } = require("../models");
+const { signToken } = require("../utils/auth");
+const { AuthenticationError } = require("apollo-server-express");
 
 const resolvers = {
     Query: { // find one user by id or username
-        user: async (parent, { user = null, params }) => {
+        me: async (parent, { user = null, params }) => {
             const foundUser = {
                 $or: [{ _id: user ? user._id : params.id }, { username: params.username }] };
             return User.find(foundUser);
@@ -19,7 +20,7 @@ const resolvers = {
             );
             return updatedUser;
         },
-        deleteBook: async (parent, {user, params}) => {
+        removeBook: async (parent, {user, params}) => {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: user._id },
                 { $pull: { savedBooks: { bookId: params.bookId } } },
@@ -27,18 +28,24 @@ const resolvers = {
             );
             return updatedUser;
         },
-        createUser: async (parent, { body }) => {
-            const user = await User.create(body);
+        addUser: async (parent, { username, email, password }) => {
+            const user = await User.create({username, email, password});
             const token = signToken(user);
 
-            return { user, token }
+            return { user, token };
         },
-        login: async (parent, { body }) => {
-            const user = await User.findOne(
-                { $or: [{ username: body.username }, { email: body.email }] }
-            );
+        login: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
+
+            if (!user) {
+                throw new AuthenticationError("Bzzzzt... Wrong!")
+            };
             
-            const correctPw = await user.isCorrectPassword(body.password);
+            const correctPw = await user.isCorrectPassword(password);
+
+            if (!correctPw) {
+                throw new AuthenticationError("Bzzzzt... Wrong!")
+            };
 
             const token = signToken(user);
             return { user, token };

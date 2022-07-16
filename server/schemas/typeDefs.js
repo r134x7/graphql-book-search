@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-express";
+const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
     type User {
@@ -20,7 +20,7 @@ const typeDefs = gql`
     }
 
     type Auth {
-        token: String!
+        token: ID!
         user: User
     }
 
