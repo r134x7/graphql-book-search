@@ -3,8 +3,7 @@ const path = require('path');
 const { ApolloServer } = require ("apollo-server-express");
 
 const db = require('./config/connection');
-const { typeDefs, resolvers } = require("./schemas"); // will work when I create the schemas
-// const routes = require('./routes'); for rest api
+const { typeDefs, resolvers } = require("./schemas"); 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,8 +24,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
 
-// app.use(routes); for rest api
-
 const startApolloServer = async (typeDefs, resolvers) => {
   await server.start();
   server.applyMiddleware({ app });
@@ -39,4 +36,4 @@ const startApolloServer = async (typeDefs, resolvers) => {
   })
 };
 
-// check again for any other middleware needed such as JWT
+startApolloServer(typeDefs, resolvers);
