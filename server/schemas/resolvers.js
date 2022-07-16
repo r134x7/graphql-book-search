@@ -8,16 +8,6 @@ const resolvers = {
                 $or: [{ _id: user ? user._id : params.id }, { username: params.username }] };
             return User.find(foundUser);
         },
-        login: async (parent, { body }) => {
-            const user = await User.findOne(
-                { $or: [{ username: body.username }, { email: body.email }] }
-            );
-            
-            const correctPw = await user.isCorrectPassword(body.password);
-
-            const token = signToken(user);
-            return { user, token };
-        }
     },
     Mutation: {
         saveBook: async (parent, { user, body }) => {
@@ -42,6 +32,16 @@ const resolvers = {
             const token = signToken(user);
 
             return { user, token }
+        },
+        login: async (parent, { body }) => {
+            const user = await User.findOne(
+                { $or: [{ username: body.username }, { email: body.email }] }
+            );
+            
+            const correctPw = await user.isCorrectPassword(body.password);
+
+            const token = signToken(user);
+            return { user, token };
         },
     },
 };
