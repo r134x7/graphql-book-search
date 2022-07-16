@@ -1,4 +1,5 @@
 import { User, Book, Auth } from "../models";
+import { signToken } from "../utils/auth";
 
 const resolvers = {
     Query: { // find one user by id or username
@@ -26,6 +27,22 @@ const resolvers = {
             );
             return updatedUser;
         },
+        createUser: async (parent, { body }) => {
+            const user = await User.create(body);
+            const token = signToken(user);
+
+            return { user, token }
+        },
+        login: async (parent, { body }) => {
+            const user = await User.findOne(
+                { $or: [{ username: body.username }, { email: body.email }] }
+            );
+            
+            const correctPw = await user.isCorrectPassword(body.password);
+
+            const token = signToken(user);
+            return { user, token };
+        }
     },
 };
 
