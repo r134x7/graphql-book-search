@@ -17,22 +17,46 @@ const resolvers = {
         },
     },
     Mutation: {
-        saveBook: async (parent, { user, body }) => {
+        // saveBook: async (parent, { user, body }) => {
+        //     console.log(user);
+        //     const updatedUser = await User.findOneAndUpdate(
+        //         { _id: user._id },
+        //         {$addToSet: { savedBooks: body } },
+        //         { new: true, runValidators: true }
+        //     );
+        //     return updatedUser;
+        // },
+        saveBook: async (parent, { body }, context) => {
             console.log(user);
-            const updatedUser = await User.findOneAndUpdate(
-                { _id: user._id },
-                {$addToSet: { savedBooks: body } },
-                { new: true, runValidators: true }
-            );
-            return updatedUser;
+            if (context.user) {
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    {$addToSet: { savedBooks: body } },
+                    { new: true, runValidators: true }
+                    );
+
+                    return updatedUser;
+            }
+            throw new AuthenticationError("Session has expired, please login.");
         },
-        removeBook: async (parent, {user, params}) => {
-            const updatedUser = await User.findOneAndUpdate(
-                { _id: user._id },
-                { $pull: { savedBooks: { bookId: params.bookId } } },
-                { new: true }
-            );
-            return updatedUser;
+        // removeBook: async (parent, {user, params}) => {
+        //     const updatedUser = await User.findOneAndUpdate(
+        //         { _id: user._id },
+        //         { $pull: { savedBooks: { bookId: params.bookId } } },
+        //         { new: true }
+        //     );
+        //     return updatedUser;
+        // },
+        removeBook: async (parent, { params }, context) => {
+            if (context.user) {
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: { bookId: params.bookId } } },
+                    { new: true }
+                );
+                return updatedUser;
+            }
+            throw new AuthenticationError("Session has expired, please login.");
         },
         addUser: async (parent, { username, email, password }) => {
             const user = await User.create({username, email, password});
