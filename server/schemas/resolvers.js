@@ -4,10 +4,16 @@ const { AuthenticationError } = require("apollo-server-express");
 
 const resolvers = {
     Query: { // find one user by id or username
-        me: async (parent, { user = null, params }) => {
-            const foundUser = {
-                $or: [{ _id: user ? user._id : params.id }, { username: params.username }] };
-            return User.find(foundUser);
+        // me: async (parent, { user = null, params }) => {
+        //     const foundUser = {
+        //         $or: [{ _id: user ? user._id : params.id }, { username: params.username }] };
+        //     return User.find(foundUser);
+        // },
+        me: async (parent, args, context) => { // requires resolver context and the use of the JWT to verify the user is using their account
+            if (context.user) {
+                return User.findOne({ _id: context.user._id })
+            }
+            throw new AuthenticationError("Session has expired, please login.")
         },
     },
     Mutation: {
