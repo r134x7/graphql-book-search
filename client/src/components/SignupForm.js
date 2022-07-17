@@ -36,7 +36,7 @@ const SignupForm = () => {
       // const response = await createUser(userFormData); assuming we change things here...
       const { data } = await addUser({
         variables: { ...userFormData }
-      });
+      }); // destructures the userFormData for useMutation
 
       // if (!response.ok) {
       //   throw new Error('something went wrong!');
@@ -45,7 +45,7 @@ const SignupForm = () => {
       // const { token, user } = await response.json();
       // console.log(user); // assuming this error response is no longer used here
 
-      Auth.login(data.addUser.token); // we take the token from the addUser data
+      Auth.login(data.addUser.token); // takes the token using the destructured data from useMutation
     } catch (err) {
       console.error(err);
       setShowAlert(true);
