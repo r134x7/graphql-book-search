@@ -12,7 +12,7 @@ import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
-
+  
   // use this to determine if `useEffect()` hook needs to run again
   
   const { loading, data } = useQuery(GET_ME);
@@ -33,33 +33,34 @@ const SavedBooks = () => {
   
   // useEffect(() => { removing use effect
   // const getUserData = async () => {
-  //   try {
+    //   try {
   //     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+  
   //     if (!token) {
     //       return false;
   //     }
 
-      // const response = await getMe(token);
+  // const response = await getMe(token);
       
       // if (!response.ok) {
         //   throw new Error('something went wrong!');
         // }
-
-      // const user = await response.json();
+        
+        // const user = await response.json();
       // setUserData(user);
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // };
-    
+      //   } catch (err) {
+        //     console.error(err);
+        //   }
+        // };
+        
     // getUserData();
     // }, [userDataLength]);
     
-    const [removeBook, { error, book }] = useMutation(REMOVE_BOOK)
+    const [RemoveBook, { error, book }] = useMutation(REMOVE_BOOK)
     // create function that accepts the book's mongo _id value as param and deletes the book from the database
     const handleDeleteBook = async (bookId) => {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
+      console.log(token);
       
       console.log(bookId);
       console.log(typeof bookId);
@@ -69,19 +70,22 @@ const SavedBooks = () => {
         return false;
       }
       
-    try { 
-      // const { book } = await removeBookId(bookId)
+      try { 
+        //  const { book } = await removeBook(bookId)
+        const { book } = await RemoveBook({
+          variables: { bookId }
+        })
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
 
     //   if (!response.ok) {
     //     throw new Error('something went wrong!');
     //   }
 
-      // const updatedUser = await response.json();
-      // setUserData(updatedUser);
-      // upon success, remove book's id from localStorage
+    // const updatedUser = await response.json();
+    // setUserData(updatedUser);
+    // upon success, remove book's id from localStorage
       // console.log(book);
-      removeBook(bookId);
+      // removeBook(bookId);
     } catch (err) {
       console.error(err);
     }
@@ -89,14 +93,14 @@ const SavedBooks = () => {
 
   // if data isn't here yet, say so
   // if (!userDataLength) { // assuming we change this now to loading
-  const userData = data?.me.savedBooks || [];
   // console.log(userData);
   // console.log(userData.length);
-
+  const userData = data?.me.savedBooks || [];
+  
   if (loading) {
     return <h2>LOADING...</h2>;
   }
-
+  
   return (
     <>
       <Jumbotron fluid className='text-light bg-dark'>
