@@ -30,22 +30,21 @@ const SavedBooks = () => {
   
   // will I need to use a Token for GET_ME?...
   
-  const [removeBookId, { error, book }] = useMutation(REMOVE_BOOK)
-
+  
   // useEffect(() => { removing use effect
   // const getUserData = async () => {
   //   try {
   //     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
   //     if (!token) {
-  //       return false;
+    //       return false;
   //     }
 
       // const response = await getMe(token);
-
+      
       // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
+        //   throw new Error('something went wrong!');
+        // }
 
       // const user = await response.json();
       // setUserData(user);
@@ -53,20 +52,25 @@ const SavedBooks = () => {
     //     console.error(err);
     //   }
     // };
-
-    // getUserData();
-  // }, [userDataLength]);
-
-  // create function that accepts the book's mongo _id value as param and deletes the book from the database
-  const handleDeleteBook = async (bookId) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-    if (!token) {
-      return false;
-    }
     
+    // getUserData();
+    // }, [userDataLength]);
+    
+    const [removeBook, { error, book }] = useMutation(REMOVE_BOOK)
+    // create function that accepts the book's mongo _id value as param and deletes the book from the database
+    const handleDeleteBook = async (bookId) => {
+      const token = Auth.loggedIn() ? Auth.getToken() : null;
+      
+      console.log(bookId);
+      console.log(typeof bookId);
+      console.log({bookId: bookId});
+
+      if (!token) {
+        return false;
+      }
+      
     try { 
-      const { book } = await removeBookId(bookId)
+      // const { book } = await removeBookId(bookId)
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
 
     //   if (!response.ok) {
@@ -76,7 +80,8 @@ const SavedBooks = () => {
       // const updatedUser = await response.json();
       // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
-      removeBookId(book.bookId);
+      // console.log(book);
+      removeBook(bookId);
     } catch (err) {
       console.error(err);
     }
@@ -85,8 +90,8 @@ const SavedBooks = () => {
   // if data isn't here yet, say so
   // if (!userDataLength) { // assuming we change this now to loading
   const userData = data?.me.savedBooks || [];
-  console.log(userData);
-  console.log(userData.length);
+  // console.log(userData);
+  // console.log(userData.length);
 
   if (loading) {
     return <h2>LOADING...</h2>;
@@ -109,6 +114,7 @@ const SavedBooks = () => {
           {userData.map((book) => {
             return (
               <Card key={book.bookId} border='dark'>
+                {/* {console.log(book.bookId)} */}
                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
                 <Card.Body>
                   <Card.Title>{book.title}</Card.Title>
