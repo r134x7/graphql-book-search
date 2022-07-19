@@ -15,7 +15,7 @@ const SavedBooks = () => {
   
   // use this to determine if `useEffect()` hook needs to run again
   
-  const { loading, data } = useQuery(GET_ME, {
+  const { loading, data, refetch } = useQuery(GET_ME, {
     fetchPolicy: "no-cache" // solves the issue of books not loading in profile without refreshing
   });
 
@@ -60,7 +60,9 @@ const SavedBooks = () => {
     // getUserData();
     // }, [userDataLength]);
     
-    const [RemoveBook, { error }] = useMutation(REMOVE_BOOK)
+    const [RemoveBook, { error }] = useMutation(REMOVE_BOOK, {
+      onCompleted: refetch, // Refetch source: https://medium.com/nexl-engineering/react-apollo-cache-set-up-refetch-refetchqueries-and-fetchpolicy-explained-with-examples-80cae6573401#:~:text=refetch%20is%20a%20function%20to,list%20after%20publishing%20a%20article.
+    })
     // create function that accepts the book's mongo _id value as param and deletes the book from the database
     const handleDeleteBook = async (bookId) => {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -84,6 +86,7 @@ const SavedBooks = () => {
     // setUserData(updatedUser);
     // upon success, remove book's id from localStorage
       // console.log(book);
+      console.log(userData);
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
