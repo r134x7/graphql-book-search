@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from 'react'; // removing useEffect and useState
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
 import { useQuery, useMutation  } from '@apollo/client'; // getting use query and use mutation hooks
@@ -15,7 +15,11 @@ const SavedBooks = () => {
   
   // use this to determine if `useEffect()` hook needs to run again
   
-  const { loading, data } = useQuery(GET_ME);
+  const { loading, data } = useQuery(GET_ME, {
+    fetchPolicy: "no-cache" // solves the issue of books not loading in profile without refreshing
+  });
+
+  const userData = data?.me.savedBooks || [];
   
   // // const userData = data?.savedBooks || {}; // I assume we no longer need the userData useState...
   // // const userData = data?.bookCount || 0; // I assume we no longer need the userData useState...
@@ -56,15 +60,10 @@ const SavedBooks = () => {
     // getUserData();
     // }, [userDataLength]);
     
-    const [RemoveBook, { error, book }] = useMutation(REMOVE_BOOK)
+    const [RemoveBook, { error }] = useMutation(REMOVE_BOOK)
     // create function that accepts the book's mongo _id value as param and deletes the book from the database
     const handleDeleteBook = async (bookId) => {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
-      console.log(token);
-      
-      console.log(bookId);
-      console.log(typeof bookId);
-      console.log({bookId: bookId});
 
       if (!token) {
         return false;
@@ -72,7 +71,7 @@ const SavedBooks = () => {
       
       try { 
         //  const { book } = await removeBook(bookId)
-        const { book } = await RemoveBook({
+        await RemoveBook({
           variables: { bookId }
         })
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
@@ -85,7 +84,7 @@ const SavedBooks = () => {
     // setUserData(updatedUser);
     // upon success, remove book's id from localStorage
       // console.log(book);
-      // removeBook(bookId);
+      removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
@@ -95,11 +94,14 @@ const SavedBooks = () => {
   // if (!userDataLength) { // assuming we change this now to loading
   // console.log(userData);
   // console.log(userData.length);
-  const userData = data?.me.savedBooks || [];
+
+  // useEffect(() => {
+  //   userData = data?.me.savedBooks || [];
+  // }, [handleDeleteBook])
   
-  if (loading) {
-    return <h2>LOADING...</h2>;
-  }
+  // if (loading) {
+  //   return <h2>LOADING...</h2>;
+  // }
   
   return (
     <>
@@ -108,7 +110,12 @@ const SavedBooks = () => {
           <h1>Viewing saved books!</h1>
         </Container>
       </Jumbotron>
-      <Container>
+        {loading ? (
+          <Container>
+          <h2>LOADING...</h2>
+          </Container>
+        ) : (
+        <Container>
         <h2>
           {userData.length
             ? `Viewing ${userData.length} saved ${userData.length === 1 ? 'book' : 'books'}:`
@@ -124,6 +131,11 @@ const SavedBooks = () => {
                   <Card.Title>{book.title}</Card.Title>
                   <p className='small'>Authors: {book.authors}</p>
                   <Card.Text>{book.description}</Card.Text>
+                  <Card.Text>
+                    <a href={book.link} target="_blank" rel='noreferrer'>
+                      <Button className='btn-block btn-success'>Link to Book</Button>  
+                    </a>
+                  </Card.Text>
                   <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
                     Delete this Book!
                   </Button>
@@ -133,6 +145,7 @@ const SavedBooks = () => {
           })}
         </CardColumns>
       </Container>
+          )}
     </>
   );
 };
