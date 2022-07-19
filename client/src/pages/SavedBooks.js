@@ -14,11 +14,19 @@ const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
 
   // use this to determine if `useEffect()` hook needs to run again
-  // const userDataLength = Object.keys(userData).length; // assuming this won't be needed either
   
   const { loading, data } = useQuery(GET_ME);
   
-  const userData = data?.bookCount || {}; // I assume we no longer need the userData useState...
+  // // const userData = data?.savedBooks || {}; // I assume we no longer need the userData useState...
+  // // const userData = data?.bookCount || 0; // I assume we no longer need the userData useState...
+  // const userData = data?.me.savedBooks || [];
+  // // const userData = data?.me.savedBooks ;
+  // console.log(userData);
+  // console.log(userData);
+  // console.log(userData);
+
+  // const userDataLength = Object.keys(userData).length; // assuming this won't be needed either
+  // console.log(userDataLength);
   
   // will I need to use a Token for GET_ME?...
   
@@ -58,6 +66,7 @@ const SavedBooks = () => {
     }
     
     try { 
+      const { book } = await removeBookId(bookId)
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
 
     //   if (!response.ok) {
@@ -67,7 +76,7 @@ const SavedBooks = () => {
       // const updatedUser = await response.json();
       // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
-      removeBookId(bookId);
+      removeBookId(book.bookId);
     } catch (err) {
       console.error(err);
     }
@@ -75,6 +84,10 @@ const SavedBooks = () => {
 
   // if data isn't here yet, say so
   // if (!userDataLength) { // assuming we change this now to loading
+  const userData = data?.me.savedBooks || [];
+  console.log(userData);
+  console.log(userData.length);
+
   if (loading) {
     return <h2>LOADING...</h2>;
   }
@@ -88,12 +101,12 @@ const SavedBooks = () => {
       </Jumbotron>
       <Container>
         <h2>
-          {userData.savedBooks.length
-            ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
+          {userData.length
+            ? `Viewing ${userData.length} saved ${userData.length === 1 ? 'book' : 'books'}:`
             : 'You have no saved books!'}
         </h2>
         <CardColumns>
-          {userData.savedBooks.map((book) => {
+          {userData.map((book) => {
             return (
               <Card key={book.bookId} border='dark'>
                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
