@@ -42,7 +42,7 @@ const LoginForm = () => {
 
       // const { token, user } = await response.json();
       // console.log(user); // assuming this is no longer needed
-
+      
       Auth.login(data.login.token); // takes the token using the destructured data from useMutation
     } catch (err) {
       console.error(err);
