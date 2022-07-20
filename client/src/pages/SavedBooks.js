@@ -16,7 +16,7 @@ const SavedBooks = () => {
   // use this to determine if `useEffect()` hook needs to run again
   
   const { loading, data, refetch } = useQuery(GET_ME, {
-    fetchPolicy: "no-cache" // solves the issue of books not loading in profile without refreshing
+    fetchPolicy: "cache-and-network" // solves the issue of books not loading in profile without refreshing
   });
 
   const userData = data?.me.savedBooks || [];
@@ -60,9 +60,46 @@ const SavedBooks = () => {
     // getUserData();
     // }, [userDataLength]);
     
-    const [RemoveBook, { error }] = useMutation(REMOVE_BOOK, {
-      onCompleted: refetch, // Refetch source: https://medium.com/nexl-engineering/react-apollo-cache-set-up-refetch-refetchqueries-and-fetchpolicy-explained-with-examples-80cae6573401#:~:text=refetch%20is%20a%20function%20to,list%20after%20publishing%20a%20article.
-    })
+    // const [RemoveBook, { error }] = useMutation(REMOVE_BOOK, {
+    //   onCompleted: refetch, // Refetch source: https://medium.com/nexl-engineering/react-apollo-cache-set-up-refetch-refetchqueries-and-fetchpolicy-explained-with-examples-80cae6573401#:~:text=refetch%20is%20a%20function%20to,list%20after%20publishing%20a%20article.
+    // })
+    
+    const [removeBook, { error }] = useMutation(REMOVE_BOOK, {
+      update(cache, { data }) {
+        try {
+          const { me } = cache.readQuery({ query: GET_ME });
+          console.log(data);
+          console.log(data.removeBook.savedBooks);
+          console.log(me.savedBooks);
+          cache.writeQuery({
+            query: GET_ME,
+            data: { me: [me.savedBooks, data.removeBook.savedBooks]},
+          });
+
+          
+        } catch (e) {
+          console.error(e);
+        }
+      },
+    });
+      //   // try {
+      //     const { me } = cache.readQuery({ query: GET_ME, optimistic: true })}
+      //     // onCompleted: refetch,
+      //     // refetchQueries: ["me"],
+      //     // onQueryUpdated(observableQuery) {
+            
+      //     // },
+          
+      //     // console.log(removeBook);
+      //   //   cache.writeQuery({
+      //   //     query: GET_ME,
+      //   //     data: { me: [...me] },
+      //   //   }),
+      //   // } catch (e) {
+      //   //   console.error(e);
+      //   // }
+      
+      // });
     // create function that accepts the book's mongo _id value as param and deletes the book from the database
     const handleDeleteBook = async (bookId) => {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -73,7 +110,7 @@ const SavedBooks = () => {
       
       try { 
         //  const { book } = await removeBook(bookId)
-        await RemoveBook({
+        await removeBook({
           variables: { bookId }
         })
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
