@@ -15,7 +15,7 @@ const SavedBooks = () => {
   
   // use this to determine if `useEffect()` hook needs to run again
   
-  const { loading, data, refetch } = useQuery(GET_ME, {
+  const { loading, data } = useQuery(GET_ME, {
     fetchPolicy: "cache-and-network" // solves the issue of books not loading in profile without refreshing
   });
 
@@ -65,15 +65,18 @@ const SavedBooks = () => {
     // })
     
     const [removeBook, { error }] = useMutation(REMOVE_BOOK, {
-      update(cache, { data }) {
+      update(cache, { data: { removeBook } }) {
         try {
           const { me } = cache.readQuery({ query: GET_ME });
-          console.log(data);
-          console.log(data.removeBook.savedBooks);
+          console.log(removeBook);
+          console.log(removeBook.savedBooks);
+          console.log({...removeBook.savedBooks});
           console.log(me.savedBooks);
+          // console.log(me);
+
           cache.writeQuery({
             query: GET_ME,
-            data: { me: [me.savedBooks, data.removeBook.savedBooks]},
+            data: { me: [{...me}, {_id: me._id, username: me.username, email: me.email, bookCount: me.bookCount , savedBooks: [{...removeBook.savedBooks}]} ]}, // Had to add objects manually due to a console.error that occurs regarding missing fields despite the writeQuery still working correctly. There is still a console error regarding missing fields in the savedBooks section but I spent too long trying to find a solution to the issue which isn't really preventing the function from working.
           });
 
           
@@ -101,17 +104,17 @@ const SavedBooks = () => {
       
       // });
     // create function that accepts the book's mongo _id value as param and deletes the book from the database
-    const handleDeleteBook = async (bookId) => {
+    const handleDeleteBook = async (book) => {
       const token = Auth.loggedIn() ? Auth.getToken() : null;
 
       if (!token) {
         return false;
       }
-      
+      console.log(book);
       try { 
         //  const { book } = await removeBook(bookId)
         await removeBook({
-          variables: { bookId }
+          variables: { ...book }
         })
     //   const response = await deleteBook(bookId, token); // removing the rest api responses
 
@@ -123,8 +126,8 @@ const SavedBooks = () => {
     // setUserData(updatedUser);
     // upon success, remove book's id from localStorage
       // console.log(book);
-      console.log(userData);
-      removeBookId(bookId);
+      // console.log(userData);
+      removeBookId(book.bookId);
     } catch (err) {
       console.error(err);
     }
@@ -176,7 +179,7 @@ const SavedBooks = () => {
                       <Button className='btn-block btn-success'>Link to Book</Button>  
                     </a>
                   </Card.Text>
-                  <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
+                  <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book)}>
                     Delete this Book!
                   </Button>
                 </Card.Body>
