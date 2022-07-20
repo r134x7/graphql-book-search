@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-// import { createUser } from '../utils/API'; // assuming we don't use this...
 import { useMutation } from "@apollo/client";
 import { ADD_USER } from "../utils/mutations";
 import Auth from '../utils/auth';
@@ -33,17 +32,9 @@ const SignupForm = () => {
     }
 
     try {
-      // const response = await createUser(userFormData); assuming we change things here...
       const { data } = await addUser({
         variables: { ...userFormData }
       }); // destructures the userFormData for useMutation
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // } // assuming this error response is no longer used here
-
-      // const { token, user } = await response.json();
-      // console.log(user); // assuming this error response is no longer used here
 
       Auth.login(data.addUser.token); // takes the token using the destructured data from useMutation
     } catch (err) {

@@ -12,7 +12,7 @@ const typeDefs = gql`
 
     type Book {
         bookId: String!
-        authors: [String] # assuming it works like this
+        authors: [String]
         description: String!
         title: String!
         image: String
@@ -25,7 +25,7 @@ const typeDefs = gql`
     }
 
     type Query {
-        me: User #does it require _id...
+        me: User
     }
 
     input saveBookInput {

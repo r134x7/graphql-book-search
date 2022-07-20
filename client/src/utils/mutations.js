@@ -24,8 +24,6 @@ export const ADD_USER = gql`
     }
 `;
 
-// I assume I am going to need to the user's ID when saving or removing a book...
-
 export const SAVE_BOOK = gql`
     mutation saveBook($input: saveBookInput) {
         saveBook(input: $input) {

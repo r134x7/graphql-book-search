@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: authMiddleware, // must be an issue with the JWT.....
+  context: authMiddleware, // needed for running the JWT auth file
 });
 
 app.use(express.urlencoded({ extended: true }));
@@ -27,10 +27,10 @@ app.get("/", (req, res) => {
 });
 
 const startApolloServer = async (typeDefs, resolvers) => {
-  await server.start();
-  server.applyMiddleware({ app });
+  await server.start(); // await to start the server
+  server.applyMiddleware({ app }); // apply the express middleware
 
-  db.once('open', () => {
+  db.once('open', () => { // open the database connection to mongoose
     app.listen(PORT, () => {
       console.log(`🌍 Now listening on localhost:${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
@@ -38,4 +38,4 @@ const startApolloServer = async (typeDefs, resolvers) => {
   })
 };
 
-startApolloServer(typeDefs, resolvers);
+startApolloServer(typeDefs, resolvers); // have to call the function to startApolloServer

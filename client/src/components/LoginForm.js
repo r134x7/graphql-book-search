@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-// import { loginUser } from '../utils/API'; // assuming we no longer need this REST API
 import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
@@ -31,17 +30,9 @@ const LoginForm = () => {
     }
 
     try {
-      // const response = await loginUser(userFormData); // removing this function
       const { data } = await login({
         variables: { ...userFormData },
       }); // destructures the userFormData for useMutation
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // } // assuming this is no longer needed
-
-      // const { token, user } = await response.json();
-      // console.log(user); // assuming this is no longer needed
       
       Auth.login(data.login.token); // takes the token using the destructured data from useMutation
     } catch (err) {

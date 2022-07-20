@@ -5,8 +5,8 @@ import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
 
 import Auth from '../utils/auth';
-// import { saveBook, searchGoogleBooks } from '../utils/API';
-import { searchGoogleBooks } from '../utils/API'; // assuming we still need to use searchGoogleBooks as is
+
+import { searchGoogleBooks } from '../utils/API'; 
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -53,8 +53,6 @@ const SearchBooks = () => {
         link: book.volumeInfo.infoLink || "No link to display",
       }));
 
-      console.log(bookData);
-
       setSearchedBooks(bookData);
       setSearchInput('');
     } catch (err) {
@@ -66,9 +64,6 @@ const SearchBooks = () => {
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-    console.log(bookId);
-    console.log(bookToSave);
-    console.log({...bookToSave});
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -78,19 +73,12 @@ const SearchBooks = () => {
     }
 
     try {
-      // const response = await saveBook(bookToSave, token); // removing this function
 
       const { data } = await saveBook({
-        variables: { input: {...bookToSave} } // assuming these are the variables needed...
+        variables: { input: {...bookToSave} } // has to be written this way to get the inputs correct due to input type used
       });
-      console.log(data);
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // } // assuming this is no longer needed
-
-      // if book successfully saves to user's account, save book id to state
-      // setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      
+      setSavedBookIds([...savedBookIds, bookToSave.bookId]); // adds a new bookId to the array of saved bookIds
     } catch (err) {
       console.error(err);
     }
