@@ -13,7 +13,7 @@ const server = new ApolloServer({
   resolvers,
   context: authMiddleware, // needed for running the JWT auth file
 });
-
+// redeploying to heroku because of: "In addition, as any applications running Node.js could potentially be impacted by CVE-2022-3786 and CVE-2022-3602, we strongly suggest that you rebuild and deploy your apps on Heroku if you are running Node.js, regardless of the stack version your application uses."
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
