@@ -29,7 +29,8 @@
   
   # Deployed App
 
-  The application is deployed on Heroku: [https://intense-everglades-58353.herokuapp.com/](https://intense-everglades-58353.herokuapp.com/)
+  This app is no longer deployed on Heroku, it is now deployed on Render.
+  Render app link: [https://graphql-book-search.onrender.com/](https://graphql-book-search.onrender.com/)
 
   # Tests
   
